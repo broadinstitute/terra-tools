@@ -3,5 +3,5 @@ google-auth-httplib2==0.0.3
 gcs-oauth2-boto-plugin==2.5
 google-api-python-client==1.8.0
 google-cloud-storage==1.26.0
-google-cloud-bigquery==0.27
+google-cloud-bigquery==1.23.1
 pandas==0.25.3

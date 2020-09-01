@@ -7,23 +7,30 @@ from tqdm import tqdm
 
 def upload_tsv_to_workspace(tsv, project, workspace):
     """Split large TSV file and upload individual smaller TSV files to Terra workspace."""
+    # initiate list that will contain n items where each n = header + 5000 rows of input tsv data
     tsv_strings = []
 
-    # open input tsv file
+    # open input tsv, save header, split large tsv into 5000 row chunks, upload each 5000 chunk to Terra via API
     with open(tsv, "r") as tsvfile:
-        headers = tsvfile.readline()
-        tsv_data = headers
+        # save header from input tsv (entity:table-name_id, col1, col2, col3, ...)
+        header = tsvfile.readline()
+        # initiate tsv_subset variable with header - 5000 rows of data to be added to tsv_subset
+        tsv_subset = header
 
-        # for each line in tsv line, add to header. chunk by 5000 lines.
+        # loop through input tsv, check for 5000 rows, add to tsv_subset (already contains header)
         for i, line in enumerate(tsvfile):
-            tsv_data += line
+            # add row by row to tsv_subset
+            tsv_subset += line
 
+            # add until rows = 5000
             if i > 0 and i % 5000 == 0:
-                tsv_strings.append(tsv_data)
-                tsv_data = headers
+                # for each tsv_subset (header + 5000 rows) append to tsv_strings
+                tsv_strings.append(tsv_subset)
+                # reset tsv_subset to be only header
+                tsv_subset = header
 
         # catch the last lines from the tsv file that aren't caught by the % above
-        tsv_strings.append(tsv_data)
+        tsv_strings.append(tsv_subset)
 
         # for each chunk of 5000 rows(tsv_string) in tsv_strings, upload using API call
         for tsv_string in tqdm(tsv_strings):

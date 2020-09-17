@@ -1,62 +1,64 @@
 # -*- coding: utf-8 -*-
 """Download a remote tsv from a Terra workspace data model when it is too large to export from Terra UI."""
-import argparse
 from firecloud import api as fapi
 from tqdm import tqdm
+import argparse
 import math
-import requests
 
 
-def download_tsv_from_workspace(project, workspace, entity, tsv_name):
-    """Download large TSV file from Terra workspace."""
-    # get list of entity types in workspace using API call
+def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size):
+    """Download large TSV file from Terra workspace by designated number of rows."""
+    # get all entity types in workspace using API call
     # API = https://api.firecloud.org/#!/Entities/getEntityTypes
     request = fapi.list_entity_types(project, workspace)
     if request.status_code != 200:
         print(request.text)
 
-    # get (and report) number of entities + associated attributes of chosen entity type
+    # get/report # of entities + associated attributes(column names) of input entity type
     entity_types_json = request.json()
     entity_count = entity_types_json[entity]["count"]
     attribute_names = entity_types_json[entity]["attributeNames"]
+    entity_id = entity_types_json[entity]["idName"]
+    # add the entity_id value to list of attributes (not a default attribute of API response)
+    attribute_names.insert(0, entity_id)
 
     print(f'{entity_count} {entity}(s) to export.')
 
     with open(tsv_name, "w") as tsvout:
+        # add header with attribute values to tsv
         tsvout.write("\t".join(attribute_names) + "\n")
-        # initiate list that will contain n items where each n = rows of output tsv data
-        entity_data = []
-        # set starting row value and number of rows in single page
+        # set starting row value and calculate number of pages
         row_num = 0
-        page_size = 1000
-        # calculate number of pages
         num_pages = int(math.ceil(float(entity_count) / page_size))
 
-        # get entities per page - where each page where page_size = #rows using API call
+        # get entities by page where each page has page_size # of rows using API call
         # API = https://api.firecloud.org/#!/Entities/entityQuery
-        page_entity_responses = []
-        for i in range(1, num_pages + 1):
-            page_entity_responses.append(get_entity_by_page(project, workspace, entity, i, page_size))
+        all_page_responses = []
+        for page in range(1, num_pages + 1):
+            all_page_responses.append(get_entity_by_page(project, workspace, entity, page, page_size))
 
-        # for each request(by page) in entity_requests
-        for page_response in tqdm(page_entity_responses):
-            print(page_response)
-            exit(1)
-            for entity_json in requests.get(timeout=100)["results"]:
+        # for each response(page) in all_page_responses[] - contains parameter metadata
+        for page_response in tqdm(all_page_responses):
+            # for each set of attributes in results (no parameters) get attribute names and entity_id(name)
+            for entity_json in page_response["results"]:
                 attributes = entity_json["attributes"]
+                name = entity_json["name"]
+                # add name and value to dictionary of attributes
+                attributes[entity_id] = name
+
                 values = []
+                # for each attribute(column name) in list of attribute names(all columns for entity)
                 for attribute_name in attribute_names:
                     value = ""
-
+                    # if entity's attribute(column) is in list of attributes from response, set response's attribute value
                     if attribute_name in attributes:
                         value = attributes[attribute_name]
-                    if attribute_name == "participant" or attribute_name == "sample":
-                        value = value["entityName"]
 
                     values.append(value)
 
                 tsvout.write("\t".join(values) + "\n")
                 row_num += 1
+    print(f'Finished exporting {entity}(s) to tsv with name {tsv_name}.')
 
 
 def get_entity_by_page(project, workspace, entity, page, page_size, sort_direction='asc', filter_terms=None):
@@ -64,7 +66,6 @@ def get_entity_by_page(project, workspace, entity, page, page_size, sort_directi
     response = fapi.get_entities_query(project, workspace, entity, page=page,
                                        page_size=page_size, sort_direction=sort_direction,
                                        filter_terms=filter_terms)
-
     return(response.json())
 
 
@@ -96,6 +97,12 @@ if __name__ == "__main__":
         action='store',
         required=True,
         help='Name of tsv file to be exported from Terra to local destination.')
+    parser.add_argument(
+        '--page_size',
+        type=int,
+        default=1000,
+        action='store',
+        help='Number of entities/rows to export per page.')
 
     args = parser.parse_args()
-    download_tsv_from_workspace(args.project, args.workspace, args.entity, args.tsv_filename)
+    download_tsv_from_workspace(args.project, args.workspace, args.entity, args.tsv_filename, args.page_size)

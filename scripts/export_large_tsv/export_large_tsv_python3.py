@@ -33,11 +33,13 @@ def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size)
 
         # get entities by page where each page has page_size # of rows using API call
         # API = https://api.firecloud.org/#!/Entities/entityQuery
+        print(f'Getting all {num_pages} pages of entity data.')
         all_page_responses = []
-        for page in range(1, num_pages + 1):
+        for page in tqdm(range(1, num_pages + 1)):
             all_page_responses.append(get_entity_by_page(project, workspace, entity, page, page_size))
 
         # for each response(page) in all_page_responses[] - contains parameter metadata
+        print(f'Writing {entity_count} attributes to tsv file.')
         for page_response in tqdm(all_page_responses):
             # for each set of attributes in results (no parameters) get attribute names and entity_id(name)
             for entity_json in page_response["results"]:

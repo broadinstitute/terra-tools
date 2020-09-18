@@ -6,10 +6,10 @@ import argparse
 import math
 
 
-def get_entity_by_page(project, workspace, entity, page, page_size, sort_direction='asc', filter_terms=None):
+def get_entity_by_page(project, workspace, entity_type, page, page_size, sort_direction='asc', filter_terms=None):
     """Get entities from workspace by page given a page_size(number of entities/rows in entity table)."""
     # API = https://api.firecloud.org/#!/Entities/entityQuery
-    response = fapi.get_entities_query(project, workspace, entity, page=page,
+    response = fapi.get_entities_query(project, workspace, entity_type, page=page,
                                        page_size=page_size, sort_direction=sort_direction,
                                        filter_terms=filter_terms)
 
@@ -20,7 +20,7 @@ def get_entity_by_page(project, workspace, entity, page, page_size, sort_directi
     return(response.json())
 
 
-def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size):
+def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size):
     """Download large TSV file from Terra workspace by designated number of rows."""
     # get all entity types in workspace using API call
     # API = https://api.firecloud.org/#!/Entities/getEntityTypes
@@ -31,13 +31,13 @@ def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size)
 
     # get/report # of entities + associated attributes(column names) of input entity type
     entity_types_json = response.json()
-    entity_count = entity_types_json[entity]["count"]
-    attribute_names = entity_types_json[entity]["attributeNames"]
-    entity_id = entity_types_json[entity]["idName"]
+    entity_count = entity_types_json[entity_type]["count"]
+    attribute_names = entity_types_json[entity_type]["attributeNames"]
+    entity_id = entity_types_json[entity_type]["idName"]
     # add the entity_id value to list of attributes (not a default attribute of API response)
     attribute_names.insert(0, entity_id)
 
-    print(f'{entity_count} {entity}(s) to export.')
+    print(f'{entity_count} {entity_type}(s) to export.')
 
     with open(tsv_name, "w") as tsvout:
         # add header with attribute values to tsv
@@ -50,7 +50,7 @@ def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size)
         print(f'Getting all {num_pages} pages of entity data.')
         all_page_responses = []
         for page in tqdm(range(1, num_pages + 1)):
-            all_page_responses.append(get_entity_by_page(project, workspace, entity, page, page_size))
+            all_page_responses.append(get_entity_by_page(project, workspace, entity_type, page, page_size))
 
         # for each response(page) in all_page_responses[] - contains parameter metadata
         print(f'Writing {entity_count} attributes to tsv file.')
@@ -75,7 +75,7 @@ def download_tsv_from_workspace(project, workspace, entity, tsv_name, page_size)
                 tsvout.write("\t".join(values) + "\n")
                 row_num += 1
 
-    print(f'Finished exporting {entity}(s) to tsv with name {tsv_name}.')
+    print(f'Finished exporting {entity_type}(s) to tsv with name {tsv_name}.')
 
 
 if __name__ == "__main__":
@@ -95,11 +95,11 @@ if __name__ == "__main__":
         required=True,
         help='Name of Terra workspace.')
     parser.add_argument(
-        '--entity',
+        '--entity_type',
         type=str,
         action='store',
         required=True,
-        help='Type of entity being requested for tsv export to local destination.')
+        help='Entity type being requested for tsv export to local destination.')
     parser.add_argument(
         '--tsv_filename',
         type=str,
@@ -114,4 +114,4 @@ if __name__ == "__main__":
         help='Number of entities/rows to export per page.')
 
     args = parser.parse_args()
-    download_tsv_from_workspace(args.project, args.workspace, args.entity, args.tsv_filename, args.page_size)
+    download_tsv_from_workspace(args.project, args.workspace, args.entity_type, args.tsv_filename, args.page_size)

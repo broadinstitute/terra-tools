@@ -26,13 +26,10 @@ def get_access_token(json_credentials, new_scopes=None):
 
 
 if __name__ == "__main__":
-    # The main argument parser
     parser = argparse.ArgumentParser(description="Get an access token for a service account for use in Terra.")
 
-    # Core application arguments
     parser.add_argument('-j', '--json_credentials', help='Path to the json credentials file for this service account.')
     parser.add_argument('-d', '--default', action='store_true', help='Print application default credentials access token.')
-
     parser.add_argument('--new_scopes', type=list, help='Additional scopes to add, in the form of a list')
 
     args = parser.parse_args()

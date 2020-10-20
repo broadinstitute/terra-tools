@@ -7,14 +7,14 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 def get_access_token(json_credentials, new_scopes=None):
-    """I take a path to a service account's json credentials file and return an access token."""
+    """Takes a path to a service account's json credentials file and return an access token with scopes."""
     scopes = ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
 
     if new_scopes is not None:
         if isinstance(new_scopes, list):
             scopes = scopes + new_scopes
         else:
-            print("If you want to add additional scopes, add this in the form of a list.")
+            print("Could not parse scopes. If you want to add additional scopes, add them as a list.")
             print("For example: "
                   "\n\tpython get_access_token.py <credentials/default> \"['https://www.googleapis.com/auth/cloud-platform']\"")
             exit(1)

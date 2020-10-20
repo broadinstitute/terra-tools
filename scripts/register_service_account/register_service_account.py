@@ -1,8 +1,8 @@
 ##!/usr/bin/env python
 
+import argparse
 import requests
 
-from argparse import ArgumentParser
 from oauth2client.service_account import ServiceAccountCredentials
 from firecloud import api as fapi
 
@@ -39,7 +39,7 @@ def main(args):
 
 if __name__ == "__main__":
     # The main argument parser
-    parser = ArgumentParser(description="Register a service account for use in Terra.")
+    parser = argparse.ArgumentParser(description="Register a service account for use in Terra.")
 
     # Core application arguments
     parser.add_argument('-j', '--json_credentials', dest='json_credentials', action='store', required=True, help='Path to the json credentials file for this service account.')

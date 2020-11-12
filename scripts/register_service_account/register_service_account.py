@@ -34,7 +34,7 @@ def main(args):
     if request.status_code == 200:
         print(f"The service account {credentials._service_account_email} is now registered with Terra. You can share workspaces with this address, or use it to call APIs.")
     else:
-        fail(f"Unable to register service account: {request.text}")
+        print(f"Unable to register service account: {request.text}")
 
 
 if __name__ == "__main__":

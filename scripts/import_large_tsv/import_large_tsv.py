@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Upload a local tsv to a Terra workspace data model when it is too large to import from Terra UI."""
+"""Upload a local tsv to a Terra workspace data model when it is too large to import using the Terra UI."""
 import argparse
 from firecloud import api as fapi
 from tqdm import tqdm

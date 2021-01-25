@@ -70,7 +70,7 @@ def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_
                     if attribute_name in attributes:
                         value = attributes[attribute_name]
 
-                    values.append(value)
+                    values.append(str(value))
 
                 tsvout.write("\t".join(values) + "\n")
                 row_num += 1

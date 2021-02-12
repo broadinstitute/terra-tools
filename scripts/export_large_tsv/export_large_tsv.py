@@ -6,7 +6,7 @@ import argparse
 import math
 
 
-def get_entity_by_page(project, workspace, entity_type, page, page_size, sort_direction='asc', filter_terms=None):
+def get_entity_by_page(project, workspace, entity_type, page, page_size=1000, sort_direction='asc', filter_terms=None):
     """Get entities from workspace by page given a page_size(number of entities/rows in entity table)."""
     # API = https://api.firecloud.org/#!/Entities/entityQuery
     response = fapi.get_entities_query(project, workspace, entity_type, page=page,
@@ -20,7 +20,7 @@ def get_entity_by_page(project, workspace, entity_type, page, page_size, sort_di
     return(response.json())
 
 
-def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size, attr_list):
+def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size=1000, attr_list=None):
     """Download large TSV file from Terra workspace by designated number of rows."""
     # get all entity types in workspace using API call
     # API = https://api.firecloud.org/#!/Entities/getEntityTypes
@@ -36,7 +36,7 @@ def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_
     # if user provided list of specific attributes to return, else return all attributes
     if attr_list:
         all_attribute_names = entity_types_json[entity_type]["attributeNames"]
-        attribute_names = [attr for attr in all_attribute_names if attr in attr_list] 
+        attribute_names = [attr for attr in all_attribute_names if attr in attr_list]
     else:
         attribute_names = entity_types_json[entity_type]["attributeNames"]
 
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--entity_type', type=str, required=True, help='Entity type being requested for tsv export to local destination.')
     parser.add_argument('-f', '--tsv_filename', type=str, required=True, help='Name of tsv file to be exported from Terra to local destination.')
     parser.add_argument('-n', '--page_size', type=int, default=1000, help='Number of entities/rows to export per page.')
-    parser.add_argument('-a', '--attribute_list', nargs='+', help='Number of entities/rows to export per page.')
+    parser.add_argument('-a', '--attribute_list', nargs='+', help='column names to return - separated by spaces. ex. -a col1 col2')
 
     args = parser.parse_args()
     download_tsv_from_workspace(args.project, args.workspace, args.entity_type, args.tsv_filename, args.page_size, args.attribute_list)

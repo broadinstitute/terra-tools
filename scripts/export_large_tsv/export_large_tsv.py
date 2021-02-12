@@ -5,10 +5,10 @@ from tqdm import tqdm
 import argparse
 import math
 
-default_page_size = 1000
+DEFAULT_PAGE_SIZE = 1000
 
 
-def get_entity_by_page(project, workspace, entity_type, page, page_size=default_page_size, sort_direction='asc', filter_terms=None):
+def get_entity_by_page(project, workspace, entity_type, page, page_size=DEFAULT_PAGE_SIZE, sort_direction='asc', filter_terms=None):
     """Get entities from workspace by page given a page_size(number of entities/rows in entity table)."""
     # API = https://api.firecloud.org/#!/Entities/entityQuery
     response = fapi.get_entities_query(project, workspace, entity_type, page=page,
@@ -22,7 +22,7 @@ def get_entity_by_page(project, workspace, entity_type, page, page_size=default_
     return(response.json())
 
 
-def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size=default_page_size, attr_list=None):
+def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size=DEFAULT_PAGE_SIZE, attr_list=None):
     """Download large TSV file from Terra workspace by designated number of rows."""
     # get all entity types in workspace using API call
     # API = https://api.firecloud.org/#!/Entities/getEntityTypes
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     parser.add_argument('-w', '--workspace', type=str, required=True, help='Name of Terra workspace.')
     parser.add_argument('-e', '--entity_type', type=str, required=True, help='Entity type being requested for tsv export to local destination.')
     parser.add_argument('-f', '--tsv_filename', type=str, required=True, help='Name of tsv file to be exported from Terra to local destination.')
-    parser.add_argument('-n', '--page_size', type=int, default=default_page_size, help='Number of entities/rows to export per page.')
+    parser.add_argument('-n', '--page_size', type=int, default=DEFAULT_PAGE_SIZE, help='Number of entities/rows to export per page.')
     parser.add_argument('-a', '--attribute_list', nargs='+', help='column names to return - separated by spaces. ex. -a col1 col2')
 
     args = parser.parse_args()

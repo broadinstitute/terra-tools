@@ -5,8 +5,10 @@ from tqdm import tqdm
 import argparse
 import math
 
+DEFAULT_PAGE_SIZE = 1000
 
-def get_entity_by_page(project, workspace, entity_type, page, page_size, sort_direction='asc', filter_terms=None):
+
+def get_entity_by_page(project, workspace, entity_type, page, page_size=DEFAULT_PAGE_SIZE, sort_direction='asc', filter_terms=None):
     """Get entities from workspace by page given a page_size(number of entities/rows in entity table)."""
     # API = https://api.firecloud.org/#!/Entities/entityQuery
     response = fapi.get_entities_query(project, workspace, entity_type, page=page,
@@ -20,7 +22,7 @@ def get_entity_by_page(project, workspace, entity_type, page, page_size, sort_di
     return(response.json())
 
 
-def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size):
+def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_size=DEFAULT_PAGE_SIZE, attr_list=None):
     """Download large TSV file from Terra workspace by designated number of rows."""
     # get all entity types in workspace using API call
     # API = https://api.firecloud.org/#!/Entities/getEntityTypes
@@ -32,8 +34,14 @@ def download_tsv_from_workspace(project, workspace, entity_type, tsv_name, page_
     # get/report # of entities + associated attributes(column names) of input entity type
     entity_types_json = response.json()
     entity_count = entity_types_json[entity_type]["count"]
-    attribute_names = entity_types_json[entity_type]["attributeNames"]
     entity_id = entity_types_json[entity_type]["idName"]
+    # if user provided list of specific attributes to return, else return all attributes
+    if attr_list:
+        all_attribute_names = entity_types_json[entity_type]["attributeNames"]
+        attribute_names = [attr for attr in all_attribute_names if attr in attr_list]
+    else:
+        attribute_names = entity_types_json[entity_type]["attributeNames"]
+
     # add the entity_id value to list of attributes (not a default attribute of API response)
     attribute_names.insert(0, entity_id)
 
@@ -82,36 +90,12 @@ if __name__ == "__main__":
     # argument parser
     parser = argparse.ArgumentParser(description="Exports/downloadload a TSV file from Terra when it is too large to download via the UI.")
     # application arguments
-    parser.add_argument(
-        '--project',
-        type=str,
-        action='store',
-        required=True,
-        help='Terra namespace/project of workspace.')
-    parser.add_argument(
-        '--workspace',
-        type=str,
-        action='store',
-        required=True,
-        help='Name of Terra workspace.')
-    parser.add_argument(
-        '--entity_type',
-        type=str,
-        action='store',
-        required=True,
-        help='Entity type being requested for tsv export to local destination.')
-    parser.add_argument(
-        '--tsv_filename',
-        type=str,
-        action='store',
-        required=True,
-        help='Name of tsv file to be exported from Terra to local destination.')
-    parser.add_argument(
-        '--page_size',
-        type=int,
-        default=1000,
-        action='store',
-        help='Number of entities/rows to export per page.')
+    parser.add_argument('-p', '--project', type=str, required=True, help='Terra namespace/project of workspace.')
+    parser.add_argument('-w', '--workspace', type=str, required=True, help='Name of Terra workspace.')
+    parser.add_argument('-e', '--entity_type', type=str, required=True, help='Entity type being requested for tsv export to local destination.')
+    parser.add_argument('-f', '--tsv_filename', type=str, required=True, help='Name of tsv file to be exported from Terra to local destination.')
+    parser.add_argument('-n', '--page_size', type=int, default=DEFAULT_PAGE_SIZE, help='Number of entities/rows to export per page.')
+    parser.add_argument('-a', '--attribute_list', nargs='+', help='column names to return - separated by spaces. ex. -a col1 col2')
 
     args = parser.parse_args()
-    download_tsv_from_workspace(args.project, args.workspace, args.entity_type, args.tsv_filename, args.page_size)
+    download_tsv_from_workspace(args.project, args.workspace, args.entity_type, args.tsv_filename, args.page_size, args.attribute_list)

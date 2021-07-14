@@ -5,3 +5,4 @@ google-api-python-client==1.8.0
 google-cloud-storage==1.26.0
 google-cloud-bigquery==1.23.1
 pandas==0.25.3
+tqdm==4.35.0

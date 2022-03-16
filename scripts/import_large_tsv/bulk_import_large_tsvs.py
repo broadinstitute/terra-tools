@@ -15,9 +15,9 @@ def import_large_tsvs(tsv, project, workspace):
 
 if __name__ == "__main__":
     # argument parser
-    parser = argparse.ArgumentParser(description="Exports/downloadloads large TSV files from Terra when they are too large to download via the UI.")
+    parser = argparse.ArgumentParser(description="Imports/uploads large TSV files to Terra when they are too large to upload via the UI.")
     # application arguments
-    parser.add_argument('-t', '--tsv', type=str, required=True, help='path to tsv file with paths to data table load file (tsv).')
+    parser.add_argument('-t', '--tsv', type=str, required=True, help='path to new line delimited file with paths to data table load file (tsv).')
     parser.add_argument('-p-', '--project', type=str, action='store', required=True, help='Terra namespace/project of workspace.')
     parser.add_argument('-w', '--workspace', type=str, action='store', required=True, help='Name of Terra workspace.')
 

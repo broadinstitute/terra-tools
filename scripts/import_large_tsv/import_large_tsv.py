@@ -46,19 +46,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Imports/upload a TSV file to Terra when it is too large to upload via the UI.")
     # application arguments
     parser.add_argument(
-        '--project',
+        '--project', '-p-',
         type=str,
         action='store',
         required=True,
         help='Terra namespace/project of workspace.')
     parser.add_argument(
-        '--workspace',
+        '--workspace', '-w',
         type=str,
         action='store',
         required=True,
         help='Name of Terra workspace.')
     parser.add_argument(
-        '--tsv',
+        '--tsv', '-t',
         type=str,
         action='store',
         required=True,

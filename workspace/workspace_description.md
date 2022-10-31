@@ -108,11 +108,44 @@ The Python code allows the user to run the code in "dry-run" mode allowing them 
 
 -----
 
+## Jupyter Notebook: Get_Workflow_Metadata
+#### **Disclaimer:** **This Notebook is to be implemented at the user’s discretion. We are not responsible for any unexpected behavior (user error or otherwise). Please ensure that you have saved the your table .tsv files and/or data you would like to persist to a permanent location before running this Notebook.**
+
+### **What is this Notebook?**
+When launching large numbers of submissions, it can be difficult to sort through the metadata of individual workflows. For example, agregating the costs of several hundred workflows requires clicking through each submission. This notebook offers users a simple option to fetch all or some of the workflow metadata, view it, and optionally export it to BigQuery.
+
+### **What does it do?**
+This notebook uses the Firecloud API to:
+
+- List all the submissions of the current workspace.
+- List all the workflows of a selected submission.
+- For each workflow, parse out the cost, duration, and other metadata.
+
+
+### **How does it do it?**
+You may run step 1 of this notebook as-is. No modifications are necessary. Step 2 requires you to fill in the BigQuery IDs.
+
+After running step 1 of this notebook, you will be prompted to select a `submissionId`. **Please copy and paste one from the displayed table, or type in "all" (without quotes) to pull all submissions**.
+
+
+
+
+### **Notes and Considerations**
+
+If your submission has several workflows, the notebook may take several minutes to run. This is because we must make one API call per workflow. For example, if your submission has 427 workflows, the notebook will make 427 sequential API calls which may take 4-6 minutes.
+
+### **To run this notebook**
+1. Copy this Notebook into the workspace that submitted the workflows.
+2. Open the Notebook and Create a Runtime Environment if necessary.
+3. After the Notebook is open, select Cell > Run All.
+
+
 ## Workspace Change Log
 | Date | Change | Author |
 | --- | --- | --- |
 |  2020-02-18 | workspace created, dashboard updated, notebooks added | Sushma Chaluvadi |
 |  2021-05-13 | drs uri notebook added, dashboard updated | Sushma Chaluvadi |
+|  2022-10-28 | Get Workflow Data notebook added, dashboard updated | Willy Nojopranoto |
 
 ---
 

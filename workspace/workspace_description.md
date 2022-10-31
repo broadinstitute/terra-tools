@@ -112,7 +112,7 @@ The Python code allows the user to run the code in "dry-run" mode allowing them 
 #### **Disclaimer:** **This Notebook is to be implemented at the user’s discretion. We are not responsible for any unexpected behavior (user error or otherwise). Please ensure that you have saved the your table .tsv files and/or data you would like to persist to a permanent location before running this Notebook.**
 
 ### **What is this Notebook?**
-When launching large numbers of submissions, it can be difficult to sort through the metadata of individual workflows. For example, agreegating the costs of several hundred workflows requires clicking through each submission. This notebook offers users a simple option to fetch all or some of the workflow metadata, view it, and optionally export it to BigQuery.
+When launching large numbers of submissions, it can be difficult to sort through the metadata of individual workflows. For example, agregating the costs of several hundred workflows requires clicking through each submission. This notebook offers users a simple option to fetch all or some of the workflow metadata, view it, and optionally export it to BigQuery.
 
 ### **What does it do?**
 This notebook uses the Firecloud API to:
@@ -135,7 +135,7 @@ After running step 1 of this notebook, you will be prompted to select a `submiss
 If your submission has several workflows, the notebook may take several minutes to run. This is because we must make one API call per workflow. For example, if your submission has 427 workflows, the notebook will make 427 sequential API calls which may take 4-6 minutes.
 
 ### **To run this notebook**
-1. Copy this Notebook into the workspace where you want to update the Data Model DRS uris.
+1. Copy this Notebook into the workspace that submitted the workflows.
 2. Open the Notebook and Create a Runtime Environment if necessary.
 3. After the Notebook is open, select Cell > Run All.
 

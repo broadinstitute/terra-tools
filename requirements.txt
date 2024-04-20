@@ -1,4 +1,4 @@
-firecloud==0.16.26
+firecloud==0.16.37
 google-auth-httplib2==0.0.3
 gcs-oauth2-boto-plugin==2.5
 google-api-python-client==1.8.0

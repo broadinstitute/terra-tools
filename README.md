@@ -1,5 +1,15 @@
 # Tools for use with Terra
 
+
+To run a script locally:
+
+1. Clone the repository and `cd` into the `terra-tools` directory
+2. Create a virtual environment by running `python3 -m venv venv`
+3. Activate the virtual environment by running `source venv/bin/activate`
+4. Install the required packages by running `pip install -r requirements.txt`
+5. Authenticate with Google Cloud by running `gcloud auth application-default login`
+6. Run the script by running `python3 scripts/path_to_script/<script name.py> <arguments>`
+
 To run a script using Docker:
 
   `docker run --rm -it -v "$HOME"/.config:/.config -v "$HOME"/Documents/:/data broadinstitute/terra-tools:latest bash -c "cd data; python3 /scripts/path_to_script/<script name.py> <arguments>"`

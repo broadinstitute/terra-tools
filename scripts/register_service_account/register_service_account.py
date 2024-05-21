@@ -14,7 +14,23 @@ def main(args):
     headers = {"Authorization": "bearer " + credentials.get_access_token().access_token}
     headers["User-Agent"] = fapi.FISS_USER_AGENT
 
-    uri = args.fc_url + "/register/profile"
+    user_uri = args.sam_url + "/api/users/v2/self/register"
+    user_json = {
+        "acceptsTermsOfService": True,
+        "userAttributes": {
+            "marketingConsent": False
+        }
+    }
+
+    user_request = requests.post(user_uri, headers=headers, json=user_json)
+
+    if user_request.status_code == 201:
+        print(f"The service account {credentials._service_account_email} is now registered with Terra. Now updating the service account's contact email.")
+    else:
+        print(f"Unable to register service account: {user_request.text}")
+
+
+    profile_uri = args.fc_url + "/register/profile"
 
     profile_json = {
         "firstName": "None",
@@ -29,12 +45,12 @@ def main(args):
         "pi": "None",
         "nonProfitStatus": "false"
     }
-    request = requests.post(uri, headers=headers, json=profile_json)
+    profile_request = requests.post(profile_uri, headers=headers, json=profile_json)
 
-    if request.status_code == 200:
-        print(f"The service account {credentials._service_account_email} is now registered with Terra. You can share workspaces with this address, or use it to call APIs.")
+    if profile_request.status_code == 200:
+        print(f"The service account {credentials._service_account_email} is now fully registered with Terra. You can share workspaces with this address, or use it to call APIs.")
     else:
-        print(f"Unable to register service account: {request.text}")
+        print(f"Unable to register service account: {profile_request.text}")
 
 
 if __name__ == "__main__":
@@ -45,6 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('-j', '--json_credentials', dest='json_credentials', action='store', required=True, help='Path to the json credentials file for this service account.')
     parser.add_argument('-e', '--owner_email', dest='owner_email', action='store', required=True, help='Email address of the person who owns this service account')
     parser.add_argument('-u', '--url', dest='fc_url', action='store', default="https://api.firecloud.org", required=False, help='Base url of FireCloud server to contact (default https://api.firecloud.org)')
+    parser.add_argument('-s', '--sam_url', dest='sam_url', action='store', default="https://sam.dsde-prod.broadinstitute.org", required=False, help='Base url of SAM server to contact (default https://sam.dsde-prod.broadinstitute.org)')
 
     args = parser.parse_args()
 

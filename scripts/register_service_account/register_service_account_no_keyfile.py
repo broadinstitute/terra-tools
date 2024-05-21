@@ -16,6 +16,7 @@ def main():
     # Core application arguments
     parser.add_argument('-e', '--owner_email', dest='owner_email', action='store', required=True, help='Email address of the person who owns this service account')
     parser.add_argument('-u', '--url', dest='fc_url', action='store', default="https://api.firecloud.org", required=False, help='Base url of FireCloud server to contact (Default Prod URL: "https://api.firecloud.org", Dev URL: "https://firecloud-orchestration.dsde-dev.broadinstitute.org")')
+    parser.add_argument('-s', '--sam_url', dest='sam_url', action='store', default="https://sam.dsde-prod.broadinstitute.org", required=False, help='Base url of SAM server to contact (default https://sam.dsde-prod.broadinstitute.org)')
 
     # Additional arguments
     parser.add_argument('-f', '--first_name', dest='first_name', action='store', default="None", required=False, help='First name to register for user')
@@ -32,6 +33,22 @@ def main():
         "Content-Type": "application/json",
     }
 
+    user_uri = args.sam_url + "/api/users/v2/self/register"
+    user_json = {
+        "acceptsTermsOfService": True,
+        "userAttributes": {
+            "marketingConsent": False
+        }
+    }
+
+    user_response = authed_session.request('POST', user_uri, headers=headers, data=json.dumps(user_json))
+
+    if user_response.status_code == 201:
+        print(f"The service account {credentials._service_account_email} is now registered with Terra. Now updating the service account's profile information.")
+    else:
+        print(f"Unable to register service account: {user_response.text}")
+
+
     uri = args.fc_url + "/register/profile"
 
     profile_json = {"firstName": args.first_name,
@@ -45,12 +62,12 @@ def main():
                     "programLocationCountry": "None",
                     "pi": "None",
                     "nonProfitStatus": "false"}
-    response = authed_session.request('POST', uri, headers=headers, data=json.dumps(profile_json))
+    profile_response = authed_session.request('POST', uri, headers=headers, data=json.dumps(profile_json))
 
-    if response.status_code == 200:
+    if profile_response.status_code == 200:
         print("The service account %s is now registered with FireCloud. You can share workspaces with this address, or use it to call APIs." % credentials.service_account_email)
     else:
-        print("Unable to register service account: %s" % response.text)
+        print("Unable to register service account: %s" % profile_response.text)
 
 if __name__ == "__main__":
     main()
